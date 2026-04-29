@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  backend-1:
+    build: .
+    container_name: scalable-upload-server-1
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+    networks:
+      - scalable-network
+
+  backend-2:
+    build: .
+    container_name: scalable-upload-server-2
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+    networks:
+      - scalable-network
+
+  nginx:
+    image: nginx:latest
+    container_name: scalable-upload-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend-1
+      - backend-2
+    networks:
+      - scalable-network
+
+networks:
+  scalable-network:
+    driver: bridge
