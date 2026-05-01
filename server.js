@@ -38,6 +38,7 @@ const upload = multer({
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
