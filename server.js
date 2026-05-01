@@ -77,11 +77,18 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
     const result = await s3.upload(params).promise();
 
+    // Generate signed URL for accessing the image (valid for 24 hours)
+    const signedUrl = s3.getSignedUrl('getObject', {
+      Bucket: S3_BUCKET,
+      Key: filename,
+      Expires: 86400 // 24 hours
+    });
+
     // Log request distribution
     console.log(`[${new Date().toISOString()}] Upload successful - Server: ${os.hostname()}:${PORT}, File: ${filename}`);
 
     res.status(200).json({
-      url: result.Location,
+      url: signedUrl,
       bucket: S3_BUCKET,
       key: filename,
       server: `${os.hostname()}:${PORT}`
