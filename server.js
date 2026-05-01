@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const multer = require('multer');
 const aws = require('aws-sdk');
@@ -70,8 +72,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       Bucket: S3_BUCKET,
       Key: filename,
       Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-      ACL: 'public-read'
+      ContentType: req.file.mimetype
     };
 
     const result = await s3.upload(params).promise();
